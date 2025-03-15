@@ -28,7 +28,7 @@ public:
         _heapify_down(heap_i);
     }
 
-    V& operator[](const K& key) {
+    const V& view(const K& key)  {
         if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
         return heap_[map_[key]].second;
     }
@@ -118,4 +118,50 @@ private:
             i = _parent(i);
         }
     }
+
+public:
+    class ConstIterator {
+    public:
+        ConstIterator(const HeapMap& heapMap, size_t index) : heapMap_(heapMap), index_(index) {}
+
+        const pair<K, V>& operator*() const {
+            return heapMap_.heap_[index_];
+        }
+
+        const pair<K, V>* operator->() const {
+            return &heapMap_.heap_[index_];
+        }
+
+        ConstIterator& operator++() {
+            ++index_;
+            return *this;
+        }
+
+        ConstIterator operator++(int) {
+            ConstIterator temp = *this;
+            ++index_;
+            return temp;
+        }
+
+        bool operator==(const ConstIterator& other) const {
+            return index_ == other.index_;
+        }
+
+        bool operator!=(const ConstIterator& other) const {
+            return index_ != other.index_;
+        }
+
+    private:
+        const HeapMap& heapMap_;
+        size_t index_;
+    };
+
+    ConstIterator begin() const {
+        return ConstIterator(*this, 0);
+    }
+
+    ConstIterator end() const {
+        return ConstIterator(*this, heap_.size());
+    }
+
 };

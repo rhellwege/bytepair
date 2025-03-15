@@ -17,26 +17,30 @@ private:
     vector<Node<T>*> nodes;
 
 public:
-    LinkedArray() = default;
-    LinkedArray(vector<T> data) {
-        nodes(data.size());
+    void fill(const vector<T>& data) {
         Node<T>* prev = nullptr;
         for (size_t i = 0; i < data.size(); ++i) {
-            Node<T>* newNode = new Node<T>{nullptr, prev, i, data[i]};
+            T newdata = data[i];
+            Node<T>* newNode = new Node<T>{nullptr, prev, i, newdata};
             if (prev) prev->next = newNode;
             nodes.push_back(newNode);
             prev = newNode;
         }
     }
-
+    LinkedArray() {}
     ~LinkedArray() {
+        cout << "LinkedArray destructor called " << nodes.size()<< endl;
         for (auto node : nodes) {
-            delete node;
+            if (node != nullptr) delete node;
         }
     }
 
     T get_by_index(size_t index) const {
         if (index >= nodes.size()) throw out_of_range("Index out of range");
+        if (nodes[index] == nullptr) {
+            cout << "Node at index " << index << " is null" << endl;
+            throw out_of_range("Node is null");
+        }
         return nodes[index]->data;
     }
 
@@ -71,7 +75,7 @@ public:
         nodes[nodes[index]->next->index] = nullptr;
         nodes[index]->next = nodes[index]->next->next;
         if (nodes[index]->next != nullptr) {
-            nodes[index]->next->previous = nodes[index];
+            nodes[index]->next->prev = nodes[index];
         }
     }
 

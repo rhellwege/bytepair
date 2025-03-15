@@ -1,2 +1,2 @@
-bytepair: bytepair.cpp
-	g++ -fopenmp -Ofast -march=native -o bytepair ./bytepair.cpp
+bytepair: bytepair.cpp heap_map.hpp linked_array.hpp
+	g++ -g -fsanitize=address -o bytepair ./bytepair.cpp

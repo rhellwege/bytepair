@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define VERBOSE
+
 struct Pair {
     size_t l;
     size_t r;
@@ -29,6 +31,15 @@ struct PairHash {
 struct PairOccurences {
     Pair pair;
     set<size_t> occurences;
+
+    friend ostream& operator<<(ostream& os, const PairOccurences& p) {
+        os << "(" << p.pair.l << ", " << p.pair.r << ") -> [";
+        for (auto i : p.occurences) {
+            os << i << " ";
+        }
+        os << "]";
+        return os;
+    }
 };
 
 size_t heapKeyFunc(const PairOccurences& p) {
@@ -56,21 +67,24 @@ private:
         if (!freqs.contains(pair)) {
             freqs.push(pair, PairOccurences{pair, {i}});
         } else {
-            freqs[pair].occurences.insert(i);
+            freqs.update(pair, [&](PairOccurences& po) {
+                po.occurences.insert(i);
+            });
         }
     }
     inline void dec_pair(Pair pair, size_t i) {
         if (!freqs.contains(pair)) {
             throw out_of_range("Pair not found, cannot decrement");
         } else {
-            freqs[pair].occurences.erase(i);
-            if (freqs[pair].occurences.empty()) {
+            freqs.update(pair, [&](PairOccurences& po) {
+                po.occurences.erase(i);
+            });
+            if (freqs.view(pair).occurences.empty()) {
                 freqs.erase(pair);
             }
         }
     }
 public:
-    //unordered_map<Pair, size_t, PairHash> freqs;
     HeapMap<Pair, PairOccurences, PairHash, function<size_t(const PairOccurences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
@@ -90,7 +104,7 @@ public:
         }
 
         // construct the linked array of tokens
-        tokens_arr = LinkedArray<size_t>(tokens);
+        tokens_arr.fill(tokens);
 
         for (size_t i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
@@ -114,7 +128,7 @@ public:
         }
 
         // construct the linked array of tokens
-        tokens_arr = LinkedArray<size_t>(tokens);
+        tokens_arr.fill(tokens);
 
         for (size_t i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
@@ -131,26 +145,20 @@ public:
     friend ostream& operator << (ostream& os, BPE_Encoding& bpe) {
         chrono::time_point<chrono::system_clock> now = chrono::system_clock::now();
         os << "-------------------------------------------------------------------------------------------------------" << endl;
-#ifdef PARALLEL
-        os << "Parallel -- ";
-#endif
-        os << "Token Length: " << bpe.tokens.size() << " Unique tokens: " << bpe.grammar.size() << " Highest freq: "
+        os << "Token Length: " << bpe.tokens_arr.size() << " Unique tokens: " << bpe.grammar.size() << " Highest freq: "
             << bpe.highest_freq << " (" << bpe.most_freq_pair.l << ", " << bpe.most_freq_pair.r << ") Freq table size: " << bpe.freqs.size() << endl;
         chrono::duration<double> elapsed_seconds = now - bpe.start;
 
         cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-#if 0
+#ifdef VERBOSE
         os << '[';
-        for (int i = 0; i < bpe.tokens.size(); i++) {
-            os << bpe.tokens[i];
-            if (i < bpe.tokens.size() - 1) {
-                os << ", ";
-            }
+        for (const auto& tok : bpe.tokens_arr) {
+            os << tok << ", ";
         }
         os << ']' << endl;
         os << "Frequencies:" << endl << "{ ";
-        for (const auto& [key, val] : bpe.freqs) {
-            os << '(' << key.l << ", " << key.r << "): " << val << ", ";
+        for (const auto& po : bpe.freqs) {
+            os << po.second << endl;
         }
 
         os << "}" << endl;
@@ -164,134 +172,74 @@ public:
     // only one iteration
     void reduce() {
         iterations += 1;
-        // find most frequent:
-        //update_freq();
         pair<Pair, PairOccurences> most = freqs.max();
         most_freq_pair = most.first;
         highest_freq = most.second.occurences.size();
 
-        if (highest_freq <= 1) return; // not compressable
+        if (highest_freq <= 1 && iterations > 1) return; // not compressable
         grammar.push_back(most_freq_pair); // introduce a new token
 
         for (size_t occurence : most.second.occurences) {
-            if (tokens_arr[occurence] >= grammar.size()) {
+            try {
+                if (tokens_arr[occurence] >= grammar.size()) {
+                    cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
+                    throw runtime_error("Token is impossible");
+                }
+            } catch (const out_of_range& e) {
                 cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
                 throw runtime_error("Token is impossible");
             }
+            try {
+                // decrease old left (ab) if a exists
+                size_t prev_index = tokens_arr.get_prev_index(occurence);
+                Pair lpair = {tokens_arr[prev_index],most_freq_pair.l};
+                dec_pair(lpair, prev_index);
 
-            // decrease old left (ab) if a exists
-            size_t prev_index = tokens_arr.get_prev_index(occurence);
-            Pair lpair = {tokens_arr[prev_index],most_freq_pair.r};
-            dec_pair(lpair, prev_index);
+            } catch (const out_of_range& e) {
+                // ignore out of range exception
+                //cout << occurence << endl;
+            }
 
-            // decrease old right (cd) if d exists
-            size_t next_next_index = tokens_arr.get_second_next_index(occurence);
-            Pair rpair = {most_freq_pair.r,tokens_arr[next_next_index]};
-            dec_pair(rpair, next_next_index);
+            try {
+                // decrease old right (cd) if d exists
+                size_t next_next_index = tokens_arr.get_second_next_index(occurence);
+                size_t next_index = tokens_arr.get_next_index(occurence);
+                Pair rpair = {most_freq_pair.r,tokens_arr[next_next_index]};
+                dec_pair(rpair, next_index);
 
+            } catch (const out_of_range& e) {
+                // ignore out of range exception
+                //cout << occurence << endl;
+            }
 
-            // increase new left (aZ) but only if there was already a token in tokens_out
-            lpair = {tokens_arr[prev_index], grammar.size() - 1};
-            inc_pair(lpair, prev_index);
-
-            // increase new right (Zd) but only if there is a future token in input
-            rpair = {grammar.size() - 1, tokens_arr[next_next_index]};
-            inc_pair(rpair, next_next_index);
+            // dont forget to decrease THIS occurence:
+            dec_pair(most_freq_pair, occurence);
 
             // finally perform the replacement
             tokens_arr.replace_pair(occurence, grammar.size() - 1);
+
+            // increase new left (aZ) but only if there was already a token in tokens_out
+            //
+            try {
+                size_t prev_index = tokens_arr.get_prev_index(occurence);
+                Pair lpair = {tokens_arr[prev_index], grammar.size() - 1};
+                inc_pair(lpair, prev_index);
+            } catch (const out_of_range& e) {
+                // ignore out of range exception
+                //cout << occurence << endl;
+            }
+
+            // increase new right (Zd) but only if there is a future token in input
+            try {
+                size_t next_index = tokens_arr.get_next_index(occurence);
+                Pair rpair = {grammar.size() - 1, tokens_arr[next_index]};
+                inc_pair(rpair, occurence);
+            } catch (const out_of_range& e) {
+                // ignore out of range exception
+                //cout << occurence << endl;
             }
         }
-
-#if 0
-    void serialize(const string& filename) const {
-        ofstream ofs(filename, ios::binary);
-        if (!ofs) {
-            cerr << "Error opening file for writing: " << filename << endl;
-            return;
-        }
-
-        // Write the size of tokens
-        size_t tokenSize = tokens.size();
-        ofs.write(reinterpret_cast<const char*>(&tokenSize), sizeof(tokenSize));
-
-        // Write the tokens
-        ofs.write(reinterpret_cast<const char*>(tokens.data()), tokenSize * sizeof(size_t));
-
-        // Write the size of the unordered_map
-        size_t mapSize = freqs.size();
-        ofs.write(reinterpret_cast<const char*>(&mapSize), sizeof(mapSize));
-
-        // Write the contents of the unordered_map
-        for (const auto& [key, val] : freqs) {
-            ofs.write(reinterpret_cast<const char*>(&key.l), sizeof(key.l));
-            ofs.write(reinterpret_cast<const char*>(&key.r), sizeof(key.r));
-            ofs.write(reinterpret_cast<const char*>(&val), sizeof(val));
-        }
-
-        // Write most frequent pair and its frequency
-        ofs.write(reinterpret_cast<const char*>(&most_freq_pair.l), sizeof(most_freq_pair.l));
-        ofs.write(reinterpret_cast<const char*>(&most_freq_pair.r), sizeof(most_freq_pair.r));
-        ofs.write(reinterpret_cast<const char*>(&highest_freq), sizeof(highest_freq));
-
-        // Write the size of the buffer
-        size_t bufferSize = buffer.size();
-        ofs.write(reinterpret_cast<const char*>(&bufferSize), sizeof(bufferSize));
-        ofs.write(reinterpret_cast<const char*>(buffer.data()), bufferSize * sizeof(size_t));
-
-        // Write iterations
-        ofs.write(reinterpret_cast<const char*>(&iterations), sizeof(iterations));
-
-        ofs.close();
     }
-
-    void deserialize(const string& filename) {
-        ifstream ifs(filename, ios::binary);
-        if (!ifs) {
-            cerr << "Error opening file for reading: " << filename << endl;
-            return;
-        }
-
-        // Read the size of tokens
-        size_t tokenSize;
-        ifs.read(reinterpret_cast<char*>(&tokenSize), sizeof(tokenSize));
-        tokens.resize(tokenSize);
-
-        // Read the tokens
-        ifs.read(reinterpret_cast<char*>(tokens.data()), tokenSize * sizeof(size_t));
-
-        // Read the size of the unordered_map
-        size_t mapSize;
-        ifs.read(reinterpret_cast<char*>(&mapSize), sizeof(mapSize));
-
-        // Clear the existing map and read the contents
-        freqs.clear();
-        for (size_t i = 0; i < mapSize; ++i) {
-            Pair key;
-            size_t val;
-            ifs.read(reinterpret_cast<char*>(&key.l), sizeof(key.l));
-            ifs.read(reinterpret_cast<char*>(&key.r), sizeof(key.r));
-            ifs.read(reinterpret_cast<char*>(&val), sizeof(val));
-            freqs[key] = val;
-        }
-
-        // Read most frequent pair and its frequency
-        ifs.read(reinterpret_cast<char*>(&most_freq_pair.l), sizeof(most_freq_pair.l));
-        ifs.read(reinterpret_cast<char*>(&most_freq_pair.r), sizeof(most_freq_pair.r));
-        ifs.read(reinterpret_cast<char*>(&highest_freq), sizeof(highest_freq));
-
-        // Read the size of the buffer
-        size_t bufferSize;
-        ifs.read(reinterpret_cast<char*>(&bufferSize), sizeof(bufferSize));
-        buffer.resize(bufferSize);
-        ifs.read(reinterpret_cast<char*>(buffer.data()), bufferSize * sizeof(size_t));
-
-        // Read iterations
-        ifs.read(reinterpret_cast<char*>(&iterations), sizeof(iterations));
-
-        ifs.close();
-    }
-#endif
 
     void compress() {
         reduce();
@@ -323,20 +271,18 @@ vector<char> readFileToBytes(const string& filename) {
 }
 
 int main() {
-
     cout << "Loading shakespear..." << endl;
-    vector<char> shakie = readFileToBytes("./quixote.txt");
+    vector<char> shakie = readFileToBytes("./test.txt");
     cout << "done." << endl;
     BPE_Encoding e(shakie);
+    cout << e;
     e.reduce();
     cout << e;
     while (e.highest_freq > 1) {
         e.reduce();
-        if (e.iterations % 1000 == 0)
+        if (e.iterations % 1 == 0)
             cout << e;
     }
-
-    // e.serialize("shakie.bpe");
 
     return 0;
 }
