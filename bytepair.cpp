@@ -6,12 +6,14 @@
 #include <chrono>
 #include <omp.h>
 #include <set>
+#include <assert.h>
 #include "heap_map.hpp"
 #include "linked_array.hpp"
 
 using namespace std;
 
-#define VERBOSE
+//#define VERBOSE
+#define PRINT_EVERY 1000
 
 struct Pair {
     size_t l;
@@ -150,6 +152,7 @@ public:
         chrono::duration<double> elapsed_seconds = now - bpe.start;
 
         cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+        cout << "iteration: " << bpe.iterations << "\n";
 #ifdef VERBOSE
         os << '[';
         for (const auto& tok : bpe.tokens_arr) {
@@ -179,37 +182,32 @@ public:
         if (highest_freq <= 1 && iterations > 1) return; // not compressable
         grammar.push_back(most_freq_pair); // introduce a new token
 
-        for (size_t occurence : most.second.occurences) {
+        while (freqs.contains(most_freq_pair) && freqs.view(most_freq_pair).occurences.size() > 0) {
+            size_t occurence = *freqs.view(most_freq_pair).occurences.begin();
+            if (tokens_arr.get_raw(occurence) == nullptr) continue; // TODO: Am I correct?
             try {
                 if (tokens_arr[occurence] >= grammar.size()) {
                     cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
                     throw runtime_error("Token is impossible");
                 }
             } catch (const out_of_range& e) {
+                cout << "occurence: " << occurence << endl;
                 cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
                 throw runtime_error("Token is impossible");
             }
-            try {
-                // decrease old left (ab) if a exists
-                size_t prev_index = tokens_arr.get_prev_index(occurence);
-                Pair lpair = {tokens_arr[prev_index],most_freq_pair.l};
-                dec_pair(lpair, prev_index);
+            Node<size_t>* raw = tokens_arr.get_raw(occurence);
+            assert(raw != nullptr);
 
-            } catch (const out_of_range& e) {
-                // ignore out of range exception
-                //cout << occurence << endl;
+            // if previous exists, decrease old left (ab) if a exists
+            if (raw->prev != nullptr) {
+                Pair lpair = {raw->prev->data,most_freq_pair.l};
+                dec_pair(lpair, raw->prev->index);
             }
 
-            try {
-                // decrease old right (cd) if d exists
-                size_t next_next_index = tokens_arr.get_second_next_index(occurence);
-                size_t next_index = tokens_arr.get_next_index(occurence);
-                Pair rpair = {most_freq_pair.r,tokens_arr[next_next_index]};
-                dec_pair(rpair, next_index);
-
-            } catch (const out_of_range& e) {
-                // ignore out of range exception
-                //cout << occurence << endl;
+            // decrease old right (cd) if d exists
+            if (raw->next != nullptr && raw->next->next != nullptr) {
+                Pair rpair = {most_freq_pair.r,raw->next->next->data};
+                dec_pair(rpair, raw->next->index);
             }
 
             // dont forget to decrease THIS occurence:
@@ -217,27 +215,20 @@ public:
 
             // finally perform the replacement
             tokens_arr.replace_pair(occurence, grammar.size() - 1);
+            raw = tokens_arr.get_raw(occurence);
 
             // increase new left (aZ) but only if there was already a token in tokens_out
-            //
-            try {
-                size_t prev_index = tokens_arr.get_prev_index(occurence);
-                Pair lpair = {tokens_arr[prev_index], grammar.size() - 1};
-                inc_pair(lpair, prev_index);
-            } catch (const out_of_range& e) {
-                // ignore out of range exception
-                //cout << occurence << endl;
+            if (raw->prev != nullptr) {
+                Pair lpair = {raw->prev->data, grammar.size() - 1};
+                inc_pair(lpair, raw->prev->index);
             }
 
             // increase new right (Zd) but only if there is a future token in input
-            try {
-                size_t next_index = tokens_arr.get_next_index(occurence);
-                Pair rpair = {grammar.size() - 1, tokens_arr[next_index]};
+            if (raw->next != nullptr) {
+                Pair rpair = {grammar.size() - 1, raw->next->data};
                 inc_pair(rpair, occurence);
-            } catch (const out_of_range& e) {
-                // ignore out of range exception
-                //cout << occurence << endl;
             }
+
         }
     }
 
@@ -272,7 +263,7 @@ vector<char> readFileToBytes(const string& filename) {
 
 int main() {
     cout << "Loading shakespear..." << endl;
-    vector<char> shakie = readFileToBytes("./test.txt");
+    vector<char> shakie = readFileToBytes("./shakespear.txt");
     cout << "done." << endl;
     BPE_Encoding e(shakie);
     cout << e;
@@ -280,7 +271,7 @@ int main() {
     cout << e;
     while (e.highest_freq > 1) {
         e.reduce();
-        if (e.iterations % 1 == 0)
+        if (e.iterations % PRINT_EVERY == 0)
             cout << e;
     }
 

@@ -17,6 +17,7 @@ private:
     vector<Node<T>*> nodes;
 
 public:
+    size_t length;
     void fill(const vector<T>& data) {
         Node<T>* prev = nullptr;
         for (size_t i = 0; i < data.size(); ++i) {
@@ -26,6 +27,7 @@ public:
             nodes.push_back(newNode);
             prev = newNode;
         }
+        length = data.size();
     }
     LinkedArray() {}
     ~LinkedArray() {
@@ -42,6 +44,11 @@ public:
             throw out_of_range("Node is null");
         }
         return nodes[index]->data;
+    }
+
+    Node<T>* get_raw(size_t index) {
+        if (index >= nodes.size()) throw out_of_range("Index out of range");
+        return nodes[index];
     }
 
     T operator[](size_t index) const {
@@ -64,6 +71,10 @@ public:
     }
 
     size_t size() const {
+        return length;
+    }
+
+    size_t capacity() const {
         return nodes.size();
     }
 
@@ -77,6 +88,7 @@ public:
         if (nodes[index]->next != nullptr) {
             nodes[index]->next->prev = nodes[index];
         }
+        length--;
     }
 
     class Iterator {
