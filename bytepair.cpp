@@ -4,7 +4,9 @@
 #include <fstream>
 #include <chrono>
 #include <omp.h>
+#include <set>
 #include "heap_map.hpp"
+#include "linked_array.hpp"
 
 using namespace std;
 
@@ -23,6 +25,15 @@ struct PairHash {
     }
 };
 
+struct PairOccurences {
+    Pair pair;
+    set<size_t> occurences;
+};
+
+size_t heapKeyFunc(const PairOccurences& p) {
+    return p.occurences.size();
+}
+
 #ifdef PARALLEL
 // A struct to track the current maximum pair and its frequency.
 struct MaxData {
@@ -36,56 +47,83 @@ struct MaxData {
     initializer(omp_priv = { {0, 0}, 0 })
 #endif
 
+
+
 class BPE_Encoding {
+private:
+    inline void inc_pair(Pair pair, size_t i) {
+        if (!freqs.contains(pair)) {
+            freqs.push(pair, PairOccurences{pair, {i}});
+        } else {
+            freqs.update(pair, [&](PairOccurences& p) {
+                p.occurences.insert(i);
+            });
+        }
+    }
+    inline void dec_pair(Pair pair, size_t i) {
+        if (!freqs.contains(pair)) {
+            freqs.push(pair, PairOccurences{pair, {i}});
+        } else {
+            freqs.update(pair, [&](PairOccurences& p) {
+                p.occurences.erase(i);
+            });
+        }
+    }
 public:
     //unordered_map<Pair, size_t, PairHash> freqs;
-    HeapMap<Pair, size_t, PairHash> freqs;
+    HeapMap<Pair, PairOccurences, PairHash, function<size_t(const PairOccurences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
+    LinkedArray<size_t> tokens_arr;
     vector<size_t> buffer;
-    vector<size_t> tokens;
     vector<Pair> grammar;
     size_t iterations;
     chrono::time_point<std::chrono::system_clock> start;
 
-    BPE_Encoding(const string& input) {
+    BPE_Encoding(const string& input) : freqs([](const PairOccurences& p) { return p.occurences.size(); }) {
         start = (chrono::system_clock::now());
-        freqs = {};
+        vector<size_t> tokens;
         iterations = 0;
         highest_freq = 0;
         for (const unsigned char& c : input) {
             tokens.push_back((size_t)c);
         }
 
+        // construct the linked array of tokens
+        tokens_arr = LinkedArray<size_t>(tokens);
+
         for (size_t i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
         }
 
-        for (int i = 0; i < tokens.size(); i++) {
+        for (size_t i = 0; i < tokens.size(); i++) {
             if (i < tokens.size() - 1) {
                 Pair pair = Pair{tokens[i], tokens[i+1]};
-                freqs.inc(pair);
+                inc_pair(pair, i);
             }
         }
     }
 
-    BPE_Encoding(const vector<char>& input) {
+    BPE_Encoding(const vector<char>& input) : freqs([](const PairOccurences& p) { return p.occurences.size(); }) {
         start = (chrono::system_clock::now());
-        freqs = {};
+        vector<size_t> tokens;
         iterations = 0;
         highest_freq = 0;
         for (const unsigned char& c : input) {
             tokens.push_back((size_t)c);
         }
 
+        // construct the linked array of tokens
+        tokens_arr = LinkedArray<size_t>(tokens);
+
         for (size_t i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
         }
 
-        for (int i = 0; i < tokens.size(); i++) {
+        for (size_t i = 0; i < tokens.size(); i++) {
             if (i < tokens.size() - 1) {
                 Pair pair = Pair{tokens[i], tokens[i+1]};
-                freqs.inc(pair);
+                inc_pair(pair, i);
             }
         }
     }
@@ -359,14 +397,14 @@ vector<char> readFileToBytes(const string& filename) {
 int main() {
 
     cout << "Loading shakespear..." << endl;
-    vector<char> shakie = readFileToBytes("./shakespear.txt");
+    vector<char> shakie = readFileToBytes("./quixote.txt");
     cout << "done." << endl;
     BPE_Encoding e(shakie);
     e.reduce();
     cout << e;
     while (e.highest_freq > 1) {
         e.reduce();
-        if (e.iterations % 10 == 0)
+        if (e.iterations % 1000 == 0)
             cout << e;
     }
 

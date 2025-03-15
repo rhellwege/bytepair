@@ -2,38 +2,15 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <functional>
 
 using namespace std;
 
-template <typename K, typename V, typename Hasher>
+template <typename K, typename V, typename Hasher, typename HeapKeyFunc>
 class HeapMap {
 public:
-    HeapMap() = default;
+    HeapMap(HeapKeyFunc keyFunc) : keyFunc_(keyFunc) {};
     ~HeapMap() = default;
-
-    void inc(const K& key) {
-        if (map_.find(key) == map_.end()) {
-            push(key, 1);
-        } else {
-            size_t heap_i = map_[key];
-            heap_[heap_i].second++;
-            _heapify_up(map_[key]);
-            _heapify_down(map_[key]);
-        }
-    }
-
-    void dec(const K& key) {
-        if (map_.find(key) == map_.end()) {
-            throw runtime_error("Cannot decrement non-existent key");
-        }
-        size_t heap_i = map_[key];
-        heap_[heap_i].second--;
-        if (heap_[heap_i].second == 0) delete_by_map_key(key);
-        else {
-            _heapify_up(map_[key]);
-            _heapify_down(map_[key]);
-        }
-    }
 
     void push(const K& key, const V& value) {
         heap_.push_back({key, value});
@@ -42,12 +19,12 @@ public:
         _heapify_up(heap_.size() - 1);
     }
 
-    void update(const K& key, const V& value) {
+    void update(const K& key, const function<void(V&)>& updateFunc) {
         if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
         size_t heap_i = map_[key];
-        heap_[heap_i].second = value;
-        _heapify_up(map_[key]);
-        _heapify_down(map_[key]);
+        updateFunc(heap_[heap_i].second);
+        _heapify_up(heap_i);
+        _heapify_down(heap_i);
     }
 
     pair<K, V> pop() {
@@ -90,6 +67,7 @@ public:
         return item;
     }
 private:
+    HeapKeyFunc keyFunc_;
     unordered_map<K, size_t, Hasher> map_; // keeps track of indices in heap
     vector<pair<K, V>> heap_;
     void _swap(size_t i, size_t j) {
@@ -116,10 +94,10 @@ private:
         size_t largest = i;
         size_t left = _left_child(i);
         size_t right = _right_child(i);
-        if (left < heap_.size() && heap_[left].second > heap_[largest].second) {
+        if (left < heap_.size() && keyFunc_(heap_[left].second) > keyFunc_(heap_[largest].second)) {
             largest = left;
         }
-        if (right < heap_.size() && heap_[right].second > heap_[largest].second) {
+        if (right < heap_.size() && keyFunc_(heap_[right].second) > keyFunc_(heap_[largest].second)) {
             largest = right;
         }
         if (largest != i) {
@@ -129,40 +107,9 @@ private:
     }
 
     void _heapify_up(size_t i) {
-        while (i > 0 && heap_[i].second > heap_[_parent(i)].second) {
+        while (i > 0 && keyFunc_(heap_[i].second) > keyFunc_(heap_[_parent(i)].second)) {
             _swap(i, _parent(i));
             i = _parent(i);
         }
     }
-// public:
-//     // Member iterator class
-//     class ConstIterator {
-//     private:
-//         typename vector<pair<K,V>>::iterator current;
-
-//     public:
-//         ConstIterator(typename std::vector<pair<K,V>>::iterator ptr) : current(ptr) {}
-
-//         pair<K,V>& operator*() const {
-//             return *current;
-//         }
-
-//         ConstIterator& operator++() const {
-//             ++current;
-//             return *this;
-//         }
-
-//         bool operator!=(const ConstIterator& other) const {
-//             return current != other.current;
-//         }
-//     };
-
-//     // Begin and end methods that return the member's iterator
-//     ConstIterator begin() const {
-//         return ConstIterator(heap_.begin());
-//     }
-
-//     ConstIterator end() const {
-//         return ConstIterator(heap_.end());
-//     }
 };
