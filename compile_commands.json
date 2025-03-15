@@ -1,0 +1,14 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "bytepair",
+      "./bytepair.cpp"
+    ],
+    "directory": "/home/ry/dev/python/test",
+    "file": "/home/ry/dev/python/test/bytepair.cpp",
+    "output": "/home/ry/dev/python/test/bytepair"
+  }
+]
