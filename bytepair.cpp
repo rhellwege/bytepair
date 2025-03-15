@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <unordered_map>
 #include <vector>
 #include <fstream>
@@ -55,18 +56,17 @@ private:
         if (!freqs.contains(pair)) {
             freqs.push(pair, PairOccurences{pair, {i}});
         } else {
-            freqs.update(pair, [&](PairOccurences& p) {
-                p.occurences.insert(i);
-            });
+            freqs[pair].occurences.insert(i);
         }
     }
     inline void dec_pair(Pair pair, size_t i) {
         if (!freqs.contains(pair)) {
-            freqs.push(pair, PairOccurences{pair, {i}});
+            throw out_of_range("Pair not found, cannot decrement");
         } else {
-            freqs.update(pair, [&](PairOccurences& p) {
-                p.occurences.erase(i);
-            });
+            freqs[pair].occurences.erase(i);
+            if (freqs[pair].occurences.empty()) {
+                freqs.erase(pair);
+            }
         }
     }
 public:
@@ -161,119 +161,47 @@ public:
         return os;
     }
 
-    void update_freq() {
-        return;
-        highest_freq = 0;
-#ifdef PARALLEL
-        // Use a reduction to compute the per-thread maximum.
-        // Note: If keys can be negative or zero, initialize accordingly.
-        MaxData maxData = { {0, 0}, 0 };
-
-        // Use the OpenMP parallel for with our custom reduction.
-        #pragma omp parallel for reduction(maximum:maxData)
-        for (size_t b = 0; b < freqs.bucket_count(); b++) {
-            // Each thread uses a local result
-            MaxData localData = { {0, 0}, 0 };
-
-            // Iterate over each element in bucket 'b'
-            for (auto it = freqs.begin(b); it != freqs.end(b); ++it) {
-                if (it->second > localData.frequency) {
-                    localData.key = it->first;
-                    localData.frequency = it->second;
-                }
-            }
-
-            // Combine the local value into the reduction variable.
-            // The reduction clause will merge these automatically.
-            if (localData.frequency > maxData.frequency) {
-                maxData = localData;
-            }
-        }
-
-        // The reduction has computed the overall maximum.
-        highest_freq = maxData.frequency;
-        most_freq_pair = maxData.key;
-#else
-        // for (const auto& [key, val] : freqs) {
-        //     if (val > highest_freq ) {
-        //         highest_freq = val;
-        //         most_freq_pair = key;
-        //     }
-        // }
-#endif
-    }
-
     // only one iteration
     void reduce() {
         iterations += 1;
         // find most frequent:
         //update_freq();
-        pair<Pair, size_t> most = freqs.max();
+        pair<Pair, PairOccurences> most = freqs.max();
         most_freq_pair = most.first;
-        highest_freq = most.second;
+        highest_freq = most.second.occurences.size();
 
         if (highest_freq <= 1) return; // not compressable
         grammar.push_back(most_freq_pair); // introduce a new token
 
-        int i = 0;
-        while (i < tokens.size()) {
-            if (tokens[i] >= grammar.size()) {
-                cout << "Attempted to read token " << tokens[i] << " but that should be impossible." << endl;
+        for (size_t occurence : most.second.occurences) {
+            if (tokens_arr[occurence] >= grammar.size()) {
+                cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
                 throw runtime_error("Token is impossible");
             }
 
-            if (i == tokens.size() - 1){ // no pair can be created so just append the token
-                buffer.push_back(tokens[i]);
-                i += 1;
-            }
-            else {
-                Pair pair = {tokens[i], tokens[i+1]};
+            // decrease old left (ab) if a exists
+            size_t prev_index = tokens_arr.get_prev_index(occurence);
+            Pair lpair = {tokens_arr[prev_index],most_freq_pair.r};
+            dec_pair(lpair, prev_index);
 
-                if (pair == most_freq_pair) { // pair is most frequent
-                    // a[bc]d -> aZd
-                    // decrease old left (ab) if a exists
-                    if (buffer.size() > 0) {
-                        Pair lpair = {buffer[buffer.size()-1], tokens[i]};
-                        //assert lpair in pair_freqs
-                        if (!freqs.contains(lpair)) {
-                            cout << "Pair not found: " << lpair.l << " " << lpair.r << endl;
-                        }
-                        freqs.dec(lpair);
-                    }
-                    // decrease old right (cd) if d exists
-                    if (i < tokens.size() - 2) {
-                        // print("Decreasing right: ", tokens_in[idx+1], tokens_in[idx+2])
-                        Pair rpair = {tokens[i+1], tokens[i+2]};
-                        // assert rpair in pair_freqs
-                        if (!freqs.contains(rpair)) {
-                            cout << "Pair not found: " << rpair.l << " " << rpair.r << endl;
-                        }
-                        freqs.dec(rpair);
-                    }
-                    // increase new left (aZ) but only if there was already a token in tokens_out
-                    if (buffer.size() > 0){
-                        Pair lpair = {buffer[buffer.size() - 1], grammar.size() - 1};
-                        freqs.inc(lpair);
-                    }
-                    // increase new right (Zd) but only if there is a future token in input
-                    if (i < tokens.size() - 2) {
-                        Pair rpair = {grammar.size() - 1, tokens[i+2]};
-                        freqs.inc(rpair);
-                    }
-                    buffer.push_back(grammar.size() - 1); // replace with new token
-                    freqs.dec(pair);
-                    i += 2;                            // we just read the pair
-                }
-                else {
-                    buffer.push_back(tokens[i]);
-                    i += 1;
-                }
+            // decrease old right (cd) if d exists
+            size_t next_next_index = tokens_arr.get_second_next_index(occurence);
+            Pair rpair = {most_freq_pair.r,tokens_arr[next_next_index]};
+            dec_pair(rpair, next_next_index);
+
+
+            // increase new left (aZ) but only if there was already a token in tokens_out
+            lpair = {tokens_arr[prev_index], grammar.size() - 1};
+            inc_pair(lpair, prev_index);
+
+            // increase new right (Zd) but only if there is a future token in input
+            rpair = {grammar.size() - 1, tokens_arr[next_next_index]};
+            inc_pair(rpair, next_next_index);
+
+            // finally perform the replacement
+            tokens_arr.replace_pair(occurence, grammar.size() - 1);
             }
         }
-        // interchange buffer and tokens.
-        tokens = buffer;
-        buffer.clear();
-    } // END REDUCE
 
 #if 0
     void serialize(const string& filename) const {

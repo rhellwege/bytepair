@@ -19,12 +19,18 @@ public:
         _heapify_up(heap_.size() - 1);
     }
 
+
     void update(const K& key, const function<void(V&)>& updateFunc) {
         if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
         size_t heap_i = map_[key];
         updateFunc(heap_[heap_i].second);
         _heapify_up(heap_i);
         _heapify_down(heap_i);
+    }
+
+    V& operator[](const K& key) {
+        if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
+        return heap_[map_[key]].second;
     }
 
     pair<K, V> pop() {
@@ -51,7 +57,7 @@ public:
         return heap_.size();
     }
 
-    pair<K, V> delete_by_map_key(K map_key) {
+    pair<K, V> erase(K map_key) {
         if (map_.find(map_key) == map_.end()) throw runtime_error("Invalid map key");
         size_t heap_i = map_[map_key];
         pair<K, V> item = heap_[heap_i];
