@@ -4,6 +4,7 @@
 #include <fstream>
 #include <chrono>
 #include <omp.h>
+#include "heap_map.hpp"
 
 using namespace std;
 
@@ -37,7 +38,8 @@ struct MaxData {
 
 class BPE_Encoding {
 public:
-    unordered_map<Pair, size_t, PairHash> freqs;
+    //unordered_map<Pair, size_t, PairHash> freqs;
+    HeapMap<Pair, size_t, PairHash> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
     vector<size_t> buffer;
@@ -62,7 +64,7 @@ public:
         for (int i = 0; i < tokens.size(); i++) {
             if (i < tokens.size() - 1) {
                 Pair pair = Pair{tokens[i], tokens[i+1]};
-                freqs[pair] += 1;
+                freqs.inc(pair);
             }
         }
     }
@@ -122,6 +124,7 @@ public:
     }
 
     void update_freq() {
+        return;
         highest_freq = 0;
 #ifdef PARALLEL
         // Use a reduction to compute the per-thread maximum.
