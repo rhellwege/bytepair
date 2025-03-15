@@ -85,7 +85,7 @@ public:
         for (int i = 0; i < tokens.size(); i++) {
             if (i < tokens.size() - 1) {
                 Pair pair = Pair{tokens[i], tokens[i+1]};
-                freqs[pair] += 1;
+                freqs.inc(pair);
             }
         }
     }
@@ -156,12 +156,12 @@ public:
         highest_freq = maxData.frequency;
         most_freq_pair = maxData.key;
 #else
-        for (const auto& [key, val] : freqs) {
-            if (val > highest_freq ) {
-                highest_freq = val;
-                most_freq_pair = key;
-            }
-        }
+        // for (const auto& [key, val] : freqs) {
+        //     if (val > highest_freq ) {
+        //         highest_freq = val;
+        //         most_freq_pair = key;
+        //     }
+        // }
 #endif
     }
 
@@ -169,7 +169,10 @@ public:
     void reduce() {
         iterations += 1;
         // find most frequent:
-        update_freq();
+        //update_freq();
+        pair<Pair, size_t> most = freqs.max();
+        most_freq_pair = most.first;
+        highest_freq = most.second;
 
         if (highest_freq <= 1) return; // not compressable
         grammar.push_back(most_freq_pair); // introduce a new token
@@ -194,34 +197,33 @@ public:
                     if (buffer.size() > 0) {
                         Pair lpair = {buffer[buffer.size()-1], tokens[i]};
                         //assert lpair in pair_freqs
-                        freqs[lpair] -= 1;
-                        if (freqs[lpair] == 0)
-                            freqs.erase(lpair);
+                        if (!freqs.contains(lpair)) {
+                            cout << "Pair not found: " << lpair.l << " " << lpair.r << endl;
+                        }
+                        freqs.dec(lpair);
                     }
                     // decrease old right (cd) if d exists
                     if (i < tokens.size() - 2) {
                         // print("Decreasing right: ", tokens_in[idx+1], tokens_in[idx+2])
                         Pair rpair = {tokens[i+1], tokens[i+2]};
                         // assert rpair in pair_freqs
-                        freqs[rpair] -= 1;
-                        if (freqs[rpair] == 0)
-                            freqs.erase(rpair);
+                        if (!freqs.contains(rpair)) {
+                            cout << "Pair not found: " << rpair.l << " " << rpair.r << endl;
+                        }
+                        freqs.dec(rpair);
                     }
                     // increase new left (aZ) but only if there was already a token in tokens_out
                     if (buffer.size() > 0){
                         Pair lpair = {buffer[buffer.size() - 1], grammar.size() - 1};
-                        freqs[lpair] += 1;
+                        freqs.inc(lpair);
                     }
                     // increase new right (Zd) but only if there is a future token in input
                     if (i < tokens.size() - 2) {
                         Pair rpair = {grammar.size() - 1, tokens[i+2]};
-                        freqs[rpair] += 1;
+                        freqs.inc(rpair);
                     }
                     buffer.push_back(grammar.size() - 1); // replace with new token
-                    // decrease frequency we just replaced.
-                    freqs[pair] -= 1; // this will reach 0 at the end
-                    if (freqs[pair] == 0)
-                        freqs.erase(pair);
+                    freqs.dec(pair);
                     i += 2;                            // we just read the pair
                 }
                 else {
@@ -235,6 +237,7 @@ public:
         buffer.clear();
     } // END REDUCE
 
+#if 0
     void serialize(const string& filename) const {
         ofstream ofs(filename, ios::binary);
         if (!ofs) {
@@ -322,6 +325,7 @@ public:
 
         ifs.close();
     }
+#endif
 
     void compress() {
         reduce();
@@ -366,7 +370,7 @@ int main() {
             cout << e;
     }
 
-    e.serialize("shakie.bpe");
+    // e.serialize("shakie.bpe");
 
     return 0;
 }

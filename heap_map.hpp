@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -22,7 +23,9 @@ public:
     }
 
     void dec(const K& key) {
-        if (map_.find(key) == map_.end()) throw runtime_error("Cannot decrement non-existent key");
+        if (map_.find(key) == map_.end()) {
+            throw runtime_error("Cannot decrement non-existent key");
+        }
         size_t heap_i = map_[key];
         heap_[heap_i].second--;
         if (heap_[heap_i].second == 0) delete_by_map_key(key);
@@ -131,35 +134,35 @@ private:
             i = _parent(i);
         }
     }
-public:
-    // Member iterator class
-    class Iterator {
-    private:
-        typename vector<pair<K,V>>::iterator current;
+// public:
+//     // Member iterator class
+//     class ConstIterator {
+//     private:
+//         typename vector<pair<K,V>>::iterator current;
 
-    public:
-        Iterator(typename std::vector<pair<K,V>>::iterator ptr) : current(ptr) {}
+//     public:
+//         ConstIterator(typename std::vector<pair<K,V>>::iterator ptr) : current(ptr) {}
 
-        pair<K,V>& operator*() {
-            return *current;
-        }
+//         pair<K,V>& operator*() const {
+//             return *current;
+//         }
 
-        Iterator& operator++() {
-            ++current;
-            return *this;
-        }
+//         ConstIterator& operator++() const {
+//             ++current;
+//             return *this;
+//         }
 
-        bool operator!=(const Iterator& other) const {
-            return current != other.current;
-        }
-    };
+//         bool operator!=(const ConstIterator& other) const {
+//             return current != other.current;
+//         }
+//     };
 
-    // Begin and end methods that return the member's iterator
-    Iterator begin() {
-        return Iterator(heap_.begin());
-    }
+//     // Begin and end methods that return the member's iterator
+//     ConstIterator begin() const {
+//         return ConstIterator(heap_.begin());
+//     }
 
-    Iterator end() {
-        return Iterator(heap_.end());
-    }
+//     ConstIterator end() const {
+//         return ConstIterator(heap_.end());
+//     }
 };
