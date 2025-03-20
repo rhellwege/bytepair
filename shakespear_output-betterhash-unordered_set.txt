@@ -1,0 +1,579 @@
+Loading shakespear...
+done.
+-------------------------------------------------------------------------------------------------------
+Token Length: 5638473 Unique tokens: 256 Highest freq: 0 (2, 9223372036854775814) Freq table size: 2345
+elapsed time: 5.00565s
+iteration: 0
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 5442085 Unique tokens: 257 Highest freq: 196388 (13, 10) Freq table size: 2344
+elapsed time: 0.80192s
+iteration: 1
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 2074255 Unique tokens: 1256 Highest freq: 467 (85, 75) Freq table size: 143484
+elapsed time: 24.4348s
+iteration: 1000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1771547 Unique tokens: 2256 Highest freq: 204 (415, 456) Freq table size: 271486
+elapsed time: 4.87155s
+iteration: 2000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1612800 Unique tokens: 3256 Highest freq: 125 (366, 405) Freq table size: 358967
+elapsed time: 3.26306s
+iteration: 3000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1508766 Unique tokens: 4256 Highest freq: 87 (564, 288) Freq table size: 424794
+elapsed time: 2.26732s
+iteration: 4000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1432941 Unique tokens: 5256 Highest freq: 66 (295, 598) Freq table size: 475321
+elapsed time: 1.67103s
+iteration: 5000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1373789 Unique tokens: 6256 Highest freq: 53 (610, 3547) Freq table size: 514174
+elapsed time: 1.38229s
+iteration: 6000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1325773 Unique tokens: 7256 Highest freq: 44 (370, 1123) Freq table size: 547006
+elapsed time: 1.1949s
+iteration: 7000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1286060 Unique tokens: 8256 Highest freq: 36 (301, 764) Freq table size: 573936
+elapsed time: 1.02608s
+iteration: 8000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1252328 Unique tokens: 9256 Highest freq: 31 (794, 291) Freq table size: 596947
+elapsed time: 0.780606s
+iteration: 9000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1223109 Unique tokens: 10256 Highest freq: 27 (83, 10172) Freq table size: 616817
+elapsed time: 0.710806s
+iteration: 10000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1197543 Unique tokens: 11256 Highest freq: 24 (604, 389) Freq table size: 634429
+elapsed time: 0.630338s
+iteration: 11000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1174940 Unique tokens: 12256 Highest freq: 21 (107, 333) Freq table size: 649597
+elapsed time: 0.56499s
+iteration: 12000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1154788 Unique tokens: 13256 Highest freq: 19 (13245, 325) Freq table size: 662538
+elapsed time: 0.480395s
+iteration: 13000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1136508 Unique tokens: 14256 Highest freq: 17 (772, 392) Freq table size: 673808
+elapsed time: 0.446851s
+iteration: 14000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1119931 Unique tokens: 15256 Highest freq: 16 (101, 66) Freq table size: 683952
+elapsed time: 0.411374s
+iteration: 15000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1104658 Unique tokens: 16256 Highest freq: 15 (735, 393) Freq table size: 693134
+elapsed time: 0.380909s
+iteration: 16000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1090684 Unique tokens: 17256 Highest freq: 13 (295, 2262) Freq table size: 701205
+elapsed time: 0.339739s
+iteration: 17000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1077767 Unique tokens: 18256 Highest freq: 12 (6749, 7164) Freq table size: 708682
+elapsed time: 0.304903s
+iteration: 18000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1065767 Unique tokens: 19256 Highest freq: 12 (112, 738) Freq table size: 715538
+elapsed time: 0.408978s
+iteration: 19000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1054739 Unique tokens: 20256 Highest freq: 11 (1797, 883) Freq table size: 721476
+elapsed time: 0.244603s
+iteration: 20000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1044390 Unique tokens: 21256 Highest freq: 10 (13773, 268) Freq table size: 726798
+elapsed time: 0.219512s
+iteration: 21000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1034402 Unique tokens: 22256 Highest freq: 9 (747, 65) Freq table size: 731980
+elapsed time: 0.219411s
+iteration: 22000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1025402 Unique tokens: 23256 Highest freq: 9 (67, 22908) Freq table size: 736212
+elapsed time: 0.196221s
+iteration: 23000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1016494 Unique tokens: 24256 Highest freq: 8 (97, 6858) Freq table size: 740822
+elapsed time: 0.194812s
+iteration: 24000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1008494 Unique tokens: 25256 Highest freq: 8 (17515, 9332) Freq table size: 744249
+elapsed time: 0.168475s
+iteration: 25000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 1000494 Unique tokens: 26256 Highest freq: 8 (6119, 733) Freq table size: 747965
+elapsed time: 0.173729s
+iteration: 26000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 993224 Unique tokens: 27256 Highest freq: 7 (7105, 288) Freq table size: 750983
+elapsed time: 0.165537s
+iteration: 27000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 986224 Unique tokens: 28256 Highest freq: 7 (611, 1587) Freq table size: 753583
+elapsed time: 0.150608s
+iteration: 28000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 979224 Unique tokens: 29256 Highest freq: 7 (3225, 5487) Freq table size: 756642
+elapsed time: 0.167743s
+iteration: 29000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 972897 Unique tokens: 30256 Highest freq: 6 (2057, 8731) Freq table size: 758998
+elapsed time: 0.139638s
+iteration: 30000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 966900 Unique tokens: 31256 Highest freq: 6 (590, 536) Freq table size: 761058
+elapsed time: 0.133469s
+iteration: 31000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 960900 Unique tokens: 32256 Highest freq: 6 (87, 1662) Freq table size: 762944
+elapsed time: 0.126164s
+iteration: 32000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 954900 Unique tokens: 33256 Highest freq: 6 (335, 1999) Freq table size: 765142
+elapsed time: 0.146089s
+iteration: 33000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 949451 Unique tokens: 34256 Highest freq: 5 (770, 379) Freq table size: 766869
+elapsed time: 0.115511s
+iteration: 34000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 944451 Unique tokens: 35256 Highest freq: 5 (10768, 9921) Freq table size: 768253
+elapsed time: 0.105472s
+iteration: 35000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 939453 Unique tokens: 36256 Highest freq: 5 (324, 881) Freq table size: 769529
+elapsed time: 0.107169s
+iteration: 36000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 934455 Unique tokens: 37256 Highest freq: 5 (37038, 5909) Freq table size: 770469
+elapsed time: 0.0979545s
+iteration: 37000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 929457 Unique tokens: 38256 Highest freq: 5 (1434, 4569) Freq table size: 771913
+elapsed time: 0.103092s
+iteration: 38000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 924457 Unique tokens: 39256 Highest freq: 5 (2084, 423) Freq table size: 773236
+elapsed time: 0.100763s
+iteration: 39000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 920127 Unique tokens: 40256 Highest freq: 4 (4113, 67) Freq table size: 774208
+elapsed time: 0.0838678s
+iteration: 40000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 916127 Unique tokens: 41256 Highest freq: 4 (609, 8970) Freq table size: 774892
+elapsed time: 0.0796706s
+iteration: 41000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 912127 Unique tokens: 42256 Highest freq: 4 (32992, 469) Freq table size: 775484
+elapsed time: 0.080129s
+iteration: 42000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 908127 Unique tokens: 43256 Highest freq: 4 (433, 296) Freq table size: 776053
+elapsed time: 0.0773237s
+iteration: 43000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 904127 Unique tokens: 44256 Highest freq: 4 (4641, 333) Freq table size: 776583
+elapsed time: 0.0793988s
+iteration: 44000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 900127 Unique tokens: 45256 Highest freq: 4 (4471, 385) Freq table size: 776989
+elapsed time: 0.0728449s
+iteration: 45000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 896127 Unique tokens: 46256 Highest freq: 4 (2899, 256) Freq table size: 777423
+elapsed time: 0.0791664s
+iteration: 46000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 892127 Unique tokens: 47256 Highest freq: 4 (9172, 823) Freq table size: 778079
+elapsed time: 0.077994s
+iteration: 47000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 888127 Unique tokens: 48256 Highest freq: 4 (463, 2048) Freq table size: 778639
+elapsed time: 0.0805899s
+iteration: 48000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 884442 Unique tokens: 49256 Highest freq: 3 (3287, 6742) Freq table size: 778948
+elapsed time: 0.0753686s
+iteration: 49000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 881442 Unique tokens: 50256 Highest freq: 3 (5398, 7408) Freq table size: 779012
+elapsed time: 0.0603112s
+iteration: 50000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 878442 Unique tokens: 51256 Highest freq: 3 (503, 2416) Freq table size: 779056
+elapsed time: 0.0594093s
+iteration: 51000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 875442 Unique tokens: 52256 Highest freq: 3 (9404, 35356) Freq table size: 779074
+elapsed time: 0.0563099s
+iteration: 52000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 872443 Unique tokens: 53256 Highest freq: 3 (10433, 370) Freq table size: 779001
+elapsed time: 0.0612081s
+iteration: 53000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 869443 Unique tokens: 54256 Highest freq: 3 (371, 2783) Freq table size: 778946
+elapsed time: 0.0593512s
+iteration: 54000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 866443 Unique tokens: 55256 Highest freq: 3 (13696, 6080) Freq table size: 778860
+elapsed time: 0.0593613s
+iteration: 55000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 863443 Unique tokens: 56256 Highest freq: 3 (315, 16237) Freq table size: 778790
+elapsed time: 0.0590772s
+iteration: 56000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 860443 Unique tokens: 57256 Highest freq: 3 (844, 1526) Freq table size: 778627
+elapsed time: 0.0632846s
+iteration: 57000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 857443 Unique tokens: 58256 Highest freq: 3 (33519, 473) Freq table size: 778413
+elapsed time: 0.056161s
+iteration: 58000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 854444 Unique tokens: 59256 Highest freq: 3 (3609, 2931) Freq table size: 778195
+elapsed time: 0.0561929s
+iteration: 59000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 851444 Unique tokens: 60256 Highest freq: 3 (3814, 2846) Freq table size: 777896
+elapsed time: 0.0542313s
+iteration: 60000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 848444 Unique tokens: 61256 Highest freq: 3 (431, 4145) Freq table size: 777748
+elapsed time: 0.0608599s
+iteration: 61000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 845444 Unique tokens: 62256 Highest freq: 3 (488, 1820) Freq table size: 777633
+elapsed time: 0.0585272s
+iteration: 62000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 842444 Unique tokens: 63256 Highest freq: 3 (273, 1912) Freq table size: 777481
+elapsed time: 0.0566411s
+iteration: 63000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 839444 Unique tokens: 64256 Highest freq: 3 (5527, 45) Freq table size: 777290
+elapsed time: 0.0569977s
+iteration: 64000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 836444 Unique tokens: 65256 Highest freq: 3 (9091, 6546) Freq table size: 777045
+elapsed time: 0.0585814s
+iteration: 65000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 833898 Unique tokens: 66256 Highest freq: 2 (9434, 1840) Freq table size: 776610
+elapsed time: 0.0710884s
+iteration: 66000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 831898 Unique tokens: 67256 Highest freq: 2 (33946, 58237) Freq table size: 776011
+elapsed time: 0.0361468s
+iteration: 67000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 829898 Unique tokens: 68256 Highest freq: 2 (5285, 7221) Freq table size: 775466
+elapsed time: 0.0349364s
+iteration: 68000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 827898 Unique tokens: 69256 Highest freq: 2 (1812, 7330) Freq table size: 774896
+elapsed time: 0.036936s
+iteration: 69000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 825898 Unique tokens: 70256 Highest freq: 2 (2322, 260) Freq table size: 774311
+elapsed time: 0.0378414s
+iteration: 70000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 823898 Unique tokens: 71256 Highest freq: 2 (7831, 854) Freq table size: 773731
+elapsed time: 0.0359827s
+iteration: 71000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 821898 Unique tokens: 72256 Highest freq: 2 (338, 13680) Freq table size: 773096
+elapsed time: 0.0400714s
+iteration: 72000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 819898 Unique tokens: 73256 Highest freq: 2 (40943, 288) Freq table size: 772482
+elapsed time: 0.0384483s
+iteration: 73000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 817898 Unique tokens: 74256 Highest freq: 2 (8708, 2699) Freq table size: 771853
+elapsed time: 0.0351288s
+iteration: 74000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 815898 Unique tokens: 75256 Highest freq: 2 (1392, 2503) Freq table size: 771231
+elapsed time: 0.0399456s
+iteration: 75000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 813898 Unique tokens: 76256 Highest freq: 2 (9263, 469) Freq table size: 770586
+elapsed time: 0.0338864s
+iteration: 76000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 811899 Unique tokens: 77256 Highest freq: 2 (17360, 41632) Freq table size: 769953
+elapsed time: 0.033348s
+iteration: 77000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 809899 Unique tokens: 78256 Highest freq: 2 (30044, 53033) Freq table size: 769261
+elapsed time: 0.0381548s
+iteration: 78000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 807899 Unique tokens: 79256 Highest freq: 2 (53825, 402) Freq table size: 768592
+elapsed time: 0.036656s
+iteration: 79000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 805900 Unique tokens: 80256 Highest freq: 2 (11528, 1042) Freq table size: 767888
+elapsed time: 0.035023s
+iteration: 80000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 803900 Unique tokens: 81256 Highest freq: 2 (13081, 2485) Freq table size: 767201
+elapsed time: 0.0340842s
+iteration: 81000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 801902 Unique tokens: 82256 Highest freq: 2 (484, 335) Freq table size: 766476
+elapsed time: 0.0329621s
+iteration: 82000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 799902 Unique tokens: 83256 Highest freq: 2 (12472, 1386) Freq table size: 765738
+elapsed time: 0.0328831s
+iteration: 83000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 797902 Unique tokens: 84256 Highest freq: 2 (84252, 59547) Freq table size: 765022
+elapsed time: 0.0335408s
+iteration: 84000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 795902 Unique tokens: 85256 Highest freq: 2 (570, 13796) Freq table size: 764277
+elapsed time: 0.0341089s
+iteration: 85000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 793902 Unique tokens: 86256 Highest freq: 2 (308, 38934) Freq table size: 763533
+elapsed time: 0.0356044s
+iteration: 86000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 791903 Unique tokens: 87256 Highest freq: 2 (3944, 15374) Freq table size: 762767
+elapsed time: 0.0393659s
+iteration: 87000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 789904 Unique tokens: 88256 Highest freq: 2 (15477, 16344) Freq table size: 761997
+elapsed time: 0.032456s
+iteration: 88000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 787904 Unique tokens: 89256 Highest freq: 2 (17465, 11294) Freq table size: 761183
+elapsed time: 0.0316475s
+iteration: 89000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 785904 Unique tokens: 90256 Highest freq: 2 (3217, 431) Freq table size: 760407
+elapsed time: 0.0339913s
+iteration: 90000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 783904 Unique tokens: 91256 Highest freq: 2 (3270, 483) Freq table size: 759606
+elapsed time: 0.0318655s
+iteration: 91000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 781904 Unique tokens: 92256 Highest freq: 2 (1554, 92239) Freq table size: 758801
+elapsed time: 0.0329136s
+iteration: 92000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 779904 Unique tokens: 93256 Highest freq: 2 (44590, 10253) Freq table size: 757985
+elapsed time: 0.0346381s
+iteration: 93000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 777904 Unique tokens: 94256 Highest freq: 2 (2130, 3450) Freq table size: 757176
+elapsed time: 0.031472s
+iteration: 94000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 775904 Unique tokens: 95256 Highest freq: 2 (5593, 28876) Freq table size: 756331
+elapsed time: 0.0334342s
+iteration: 95000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 773904 Unique tokens: 96256 Highest freq: 2 (13476, 33274) Freq table size: 755503
+elapsed time: 0.0293884s
+iteration: 96000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 771905 Unique tokens: 97256 Highest freq: 2 (11906, 333) Freq table size: 754678
+elapsed time: 0.0296097s
+iteration: 97000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 769905 Unique tokens: 98256 Highest freq: 2 (5894, 358) Freq table size: 753813
+elapsed time: 0.0297244s
+iteration: 98000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 767906 Unique tokens: 99256 Highest freq: 2 (3863, 1989) Freq table size: 752985
+elapsed time: 0.03232s
+iteration: 99000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 765906 Unique tokens: 100256 Highest freq: 2 (1090, 3271) Freq table size: 752130
+elapsed time: 0.0337545s
+iteration: 100000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 763906 Unique tokens: 101256 Highest freq: 2 (890, 995) Freq table size: 751275
+elapsed time: 0.0329412s
+iteration: 101000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 761907 Unique tokens: 102256 Highest freq: 2 (482, 4270) Freq table size: 750396
+elapsed time: 0.0318087s
+iteration: 102000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 759907 Unique tokens: 103256 Highest freq: 2 (1012, 103248) Freq table size: 749515
+elapsed time: 0.0298672s
+iteration: 103000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 757908 Unique tokens: 104256 Highest freq: 2 (346, 25397) Freq table size: 748623
+elapsed time: 0.0320032s
+iteration: 104000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 755908 Unique tokens: 105256 Highest freq: 2 (2090, 712) Freq table size: 747737
+elapsed time: 0.032161s
+iteration: 105000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 753908 Unique tokens: 106256 Highest freq: 2 (1061, 547) Freq table size: 746834
+elapsed time: 0.0332287s
+iteration: 106000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 751908 Unique tokens: 107256 Highest freq: 2 (1942, 747) Freq table size: 745912
+elapsed time: 0.0332534s
+iteration: 107000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 749909 Unique tokens: 108256 Highest freq: 2 (619, 707) Freq table size: 744994
+elapsed time: 0.0325023s
+iteration: 108000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 747909 Unique tokens: 109256 Highest freq: 2 (713, 652) Freq table size: 744042
+elapsed time: 0.031782s
+iteration: 109000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 745909 Unique tokens: 110256 Highest freq: 2 (27240, 292) Freq table size: 743092
+elapsed time: 0.0306606s
+iteration: 110000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 743909 Unique tokens: 111256 Highest freq: 2 (54156, 6773) Freq table size: 742130
+elapsed time: 0.030161s
+iteration: 111000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 741909 Unique tokens: 112256 Highest freq: 2 (16780, 603) Freq table size: 741164
+elapsed time: 0.031767s
+iteration: 112000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 740457 Unique tokens: 112982 Highest freq: 1 (31044, 5395) Freq table size: 740456
+elapsed time: 0.0234743s
+iteration: 112727
+
+Total elapsed time: 57.8291s
+LinkedArray destructor called 5638473

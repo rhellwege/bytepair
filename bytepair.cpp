@@ -4,8 +4,8 @@
 #include <vector>
 #include <fstream>
 #include <chrono>
-#include <omp.h>
-#include <set>
+#include <unordered_set>
+//#include <set>
 #include <assert.h>
 #include "heap_map.hpp"
 #include "linked_array.hpp"
@@ -26,17 +26,17 @@ struct Pair {
 
 struct PairHash {
     size_t operator()(const Pair& p) const {
-        return hash<size_t>()(p.l) ^ hash<size_t>()(p.r);
+        return hash<size_t>()(p.l) ^ (hash<size_t>()(p.r) << 1);
     }
 };
 
-struct PairOccurences {
+struct PairOccurrences {
     Pair pair;
-    set<size_t> occurences;
+    unordered_set<size_t> occurrences; // compare based on the size of the set
 
-    friend ostream& operator<<(ostream& os, const PairOccurences& p) {
+    friend ostream& operator<<(ostream& os, const PairOccurrences& p) {
         os << "(" << p.pair.l << ", " << p.pair.r << ") -> [";
-        for (auto i : p.occurences) {
+        for (auto i : p.occurrences) {
             os << i << " ";
         }
         os << "]";
@@ -44,33 +44,18 @@ struct PairOccurences {
     }
 };
 
-size_t heapKeyFunc(const PairOccurences& p) {
-    return p.occurences.size();
+size_t heapKeyFunc(const PairOccurrences& p) {
+    return p.occurrences.size();
 }
-
-#ifdef PARALLEL
-// A struct to track the current maximum pair and its frequency.
-struct MaxData {
-    Pair key;
-    size_t frequency;
-};
-
-// Custom reduction: We want to pick the object with the higher frequency.
-#pragma omp declare reduction(maximum : MaxData :                      \
-    omp_out = (omp_in.frequency > omp_out.frequency ? omp_in : omp_out))    \
-    initializer(omp_priv = { {0, 0}, 0 })
-#endif
-
-
 
 class BPE_Encoding {
 private:
     inline void inc_pair(Pair pair, size_t i) {
         if (!freqs.contains(pair)) {
-            freqs.push(pair, PairOccurences{pair, {i}});
+            freqs.push(pair, PairOccurrences{pair, {i}});
         } else {
-            freqs.update(pair, [&](PairOccurences& po) {
-                po.occurences.insert(i);
+            freqs.update(pair, [&](PairOccurrences& po) {
+                po.occurrences.insert(i);
             });
         }
     }
@@ -78,16 +63,17 @@ private:
         if (!freqs.contains(pair)) {
             throw out_of_range("Pair not found, cannot decrement");
         } else {
-            freqs.update(pair, [&](PairOccurences& po) {
-                po.occurences.erase(i);
+            freqs.update(pair, [&](PairOccurrences& po) {
+                po.occurrences.erase(i);
             });
-            if (freqs.view(pair).occurences.empty()) {
+            if (freqs.view(pair).occurrences.empty()) {
                 freqs.erase(pair);
             }
         }
     }
 public:
-    HeapMap<Pair, PairOccurences, PairHash, function<size_t(const PairOccurences&)>> freqs;
+    HeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
+    //FibHeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
     LinkedArray<size_t> tokens_arr;
@@ -95,9 +81,11 @@ public:
     vector<Pair> grammar;
     size_t iterations;
     chrono::time_point<std::chrono::system_clock> start;
+    chrono::time_point<std::chrono::system_clock> since_last_print;
 
-    BPE_Encoding(const string& input) : freqs([](const PairOccurences& p) { return p.occurences.size(); }) {
-        start = (chrono::system_clock::now());
+    BPE_Encoding(const string& input) : freqs([](const PairOccurrences& p) { return p.occurrences.size(); }) {
+        since_last_print = chrono::system_clock::now();
+        start = chrono::system_clock::now();
         vector<size_t> tokens;
         iterations = 0;
         highest_freq = 0;
@@ -120,8 +108,9 @@ public:
         }
     }
 
-    BPE_Encoding(const vector<char>& input) : freqs([](const PairOccurences& p) { return p.occurences.size(); }) {
-        start = (chrono::system_clock::now());
+    BPE_Encoding(const vector<char>& input) : freqs([](const PairOccurrences& p) { return p.occurrences.size(); }) {
+        since_last_print = chrono::system_clock::now();
+        start = chrono::system_clock::now();
         vector<size_t> tokens;
         iterations = 0;
         highest_freq = 0;
@@ -142,6 +131,16 @@ public:
                 inc_pair(pair, i);
             }
         }
+    }
+
+
+    friend ostream& serialize(ostream& os, BPE_Encoding& bpe) {
+        os << "bpe";
+        os.write(reinterpret_cast<char*>(bpe.tokens_arr.size()), sizeof(bpe.tokens_arr.size()));
+        for (const auto& tok : bpe.tokens_arr) {
+            os.write(reinterpret_cast<char*>(tok), sizeof(tok));
+        }
+        return os;
     }
 
     friend ostream& operator << (ostream& os, BPE_Encoding& bpe) {
@@ -149,7 +148,7 @@ public:
         os << "-------------------------------------------------------------------------------------------------------" << endl;
         os << "Token Length: " << bpe.tokens_arr.size() << " Unique tokens: " << bpe.grammar.size() << " Highest freq: "
             << bpe.highest_freq << " (" << bpe.most_freq_pair.l << ", " << bpe.most_freq_pair.r << ") Freq table size: " << bpe.freqs.size() << endl;
-        chrono::duration<double> elapsed_seconds = now - bpe.start;
+        chrono::duration<double> elapsed_seconds = now - bpe.since_last_print;
 
         cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
         cout << "iteration: " << bpe.iterations << "\n";
@@ -168,33 +167,28 @@ public:
 #endif
 
         os << endl;
-        bpe.start = chrono::system_clock::now();
+        if (bpe.highest_freq == 1) {
+            now = chrono::system_clock::now();
+            elapsed_seconds = now - bpe.start;
+            os << "Total elapsed time: " << elapsed_seconds.count() << "s\n";
+        }
+        bpe.since_last_print = chrono::system_clock::now();
         return os;
     }
 
     // only one iteration
     void reduce() {
         iterations += 1;
-        pair<Pair, PairOccurences> most = freqs.max();
+        pair<Pair, PairOccurrences> most = freqs.max();
         most_freq_pair = most.first;
-        highest_freq = most.second.occurences.size();
+        highest_freq = most.second.occurrences.size();
 
         if (highest_freq <= 1 && iterations > 1) return; // not compressable
         grammar.push_back(most_freq_pair); // introduce a new token
 
-        while (freqs.contains(most_freq_pair) && freqs.view(most_freq_pair).occurences.size() > 0) {
-            size_t occurence = *freqs.view(most_freq_pair).occurences.begin();
-            if (tokens_arr.get_raw(occurence) == nullptr) continue; // TODO: Am I correct?
-            try {
-                if (tokens_arr[occurence] >= grammar.size()) {
-                    cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
-                    throw runtime_error("Token is impossible");
-                }
-            } catch (const out_of_range& e) {
-                cout << "occurence: " << occurence << endl;
-                cout << "Attempted to read token " << tokens_arr[occurence] << " but that should be impossible." << endl;
-                throw runtime_error("Token is impossible");
-            }
+        while (freqs.contains(most_freq_pair) && freqs.view(most_freq_pair).occurrences.size() > 0) {
+            size_t occurence = *freqs.view(most_freq_pair).occurrences.begin();
+            if (tokens_arr.get_raw(occurence) == nullptr) continue;
             Node<size_t>* raw = tokens_arr.get_raw(occurence);
             assert(raw != nullptr);
 
@@ -228,7 +222,6 @@ public:
                 Pair rpair = {grammar.size() - 1, raw->next->data};
                 inc_pair(rpair, occurence);
             }
-
         }
     }
 
@@ -238,6 +231,68 @@ public:
             reduce();
         }
     }
+
+    void serialize(const string& fname) {
+        ofstream file(fname, ios::binary); // Open file in binary mode
+        if (!file) {
+            cerr << "Error opening file: " << fname << endl;
+            return;
+        }
+
+        file.write("bpe0.01", 7);
+        file.write(reinterpret_cast<const char*>(&iterations), sizeof(iterations)); // not needed
+        size_t size = tokens_arr.size();
+        file.write(reinterpret_cast<const char*>(&size), sizeof(size));
+        for (const auto& token : tokens_arr) {
+            file.write(reinterpret_cast<const char*>(&token), sizeof(token)); // not needed
+        }
+        size = grammar.size();
+        file.write(reinterpret_cast<const char*>(&size), sizeof(size));
+        for (const auto& pair : grammar) {
+            file.write(reinterpret_cast<const char*>(&pair.l), sizeof(pair.l));
+            file.write(reinterpret_cast<const char*>(&pair.r), sizeof(pair.r));
+        }
+        file.close();
+    }
+
+    void deserialize(const string& fname) {
+        ifstream file(fname, ios::binary); // Open file in binary mode
+        size_t grammar_size;
+        size_t tokens_arr_size;
+        string version;
+
+        if (!file) {
+            cerr << "Error opening file: " << fname << endl;
+            return;
+        }
+
+        file >> version;
+        if (version != "bpe0.01") {
+            cerr << "Unsupported version: " << version << endl;
+            return;
+        }
+
+        file >> iterations;
+        file >> tokens_arr_size;
+
+        //tokens_arr.clear();
+        assert(tokens_arr.size() == 0);
+        for (size_t i = 0; i < tokens_arr_size; ++i) {
+            size_t token;
+            file >> token;
+            //tokens_arr.push(token);
+        }
+
+        file >> grammar_size;
+        grammar.clear();
+        for (size_t i = 0; i < grammar.size(); ++i) {
+            size_t l, r;
+            file >> l >> r;
+            grammar.push_back({l, r});
+        }
+        file.close();
+    }
+
 };
 
 vector<char> readFileToBytes(const string& filename) {
@@ -257,7 +312,6 @@ vector<char> readFileToBytes(const string& filename) {
         cerr << "Error reading file: " << filename << endl;
         return {};
     }
-
     return buffer; // Return the buffer containing the bytes
 }
 
@@ -274,6 +328,9 @@ int main() {
         if (e.iterations % PRINT_EVERY == 0)
             cout << e;
     }
-
+    cout << e;
+    // cout << "Serializing to shakie.bpe..." << endl;
+    // e.serialize("shakie.bpe");
+    // cout << "Serialization complete." << endl;
     return 0;
 }

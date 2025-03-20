@@ -76,6 +76,7 @@ private:
     HeapKeyFunc keyFunc_;
     unordered_map<K, size_t, Hasher> map_; // keeps track of indices in heap
     vector<pair<K, V>> heap_;
+
     void _swap(size_t i, size_t j) {
         map_[heap_[i].first] = j;
         map_[heap_[j].first] = i;

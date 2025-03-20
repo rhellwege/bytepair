@@ -1,0 +1,17 @@
+Loading shakespear...
+done.
+-------------------------------------------------------------------------------------------------------
+Token Length: 5638473 Unique tokens: 256 Highest freq: 0 (0, 0) Freq table size: 2345
+elapsed time: 4.87553s
+iteration: 0
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 5442085 Unique tokens: 257 Highest freq: 196388 (13, 10) Freq table size: 2344
+elapsed time: 1.30281s
+iteration: 1
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 2075838 Unique tokens: 1256 Highest freq: 468 (108, 121) Freq table size: 143752
+elapsed time: 36.1981s
+iteration: 1000
+
