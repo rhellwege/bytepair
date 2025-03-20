@@ -6,7 +6,7 @@ using namespace std;
 template <typename K, typename V, typename Hasher, typename HeapKeyFunc>
 class FibHeapMap {
 private:
-    std::unordered_map<K, V> map_;
+    unordered_map<K, V> map_;
     HeapKeyFunc keyFunc_;
 
 public:
@@ -20,13 +20,13 @@ public:
     void update(const K& key, const function<void(V&)>& updateFunc) {
     }
 
-    const V& view(const K& key)  {
+    const V& view(const K& key) const {
     }
 
     pair<K, V> pop() {
     }
 
-    pair<K, V> max() const {
+    const pair<K, V>& max() const {
     }
 
     bool contains(K key) const {

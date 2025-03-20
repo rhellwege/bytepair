@@ -44,8 +44,8 @@ struct PairOccurrences {
     }
 };
 
-size_t heapKeyFunc(const PairOccurrences& p) {
-    return p.occurrences.size();
+size_t heapKeyFunc(const pair<Pair, PairOccurrences>& p) {
+    return p.second.occurrences.size();
 }
 
 class BPE_Encoding {
@@ -72,7 +72,7 @@ private:
         }
     }
 public:
-    HeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
+    HeapMap<Pair, PairOccurrences, PairHash, function<size_t(const pair<Pair, PairOccurrences>&)>> freqs;
     //FibHeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
@@ -83,7 +83,7 @@ public:
     chrono::time_point<std::chrono::system_clock> start;
     chrono::time_point<std::chrono::system_clock> since_last_print;
 
-    BPE_Encoding(const string& input) : freqs([](const PairOccurrences& p) { return p.occurrences.size(); }) {
+    BPE_Encoding(const string& input) : freqs([](const pair<Pair, PairOccurrences>& p) { return p.second.occurrences.size(); }) {
         since_last_print = chrono::system_clock::now();
         start = chrono::system_clock::now();
         vector<size_t> tokens;
@@ -108,7 +108,7 @@ public:
         }
     }
 
-    BPE_Encoding(const vector<char>& input) : freqs([](const PairOccurrences& p) { return p.occurrences.size(); }) {
+    BPE_Encoding(const vector<char>& input) : freqs([](const pair<Pair, PairOccurrences>& p) { return p.second.occurrences.size(); }) {
         since_last_print = chrono::system_clock::now();
         start = chrono::system_clock::now();
         vector<size_t> tokens;

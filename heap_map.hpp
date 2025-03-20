@@ -19,7 +19,6 @@ public:
         _heapify_up(heap_.size() - 1);
     }
 
-
     void update(const K& key, const function<void(V&)>& updateFunc) {
         if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
         size_t heap_i = map_[key];
@@ -28,7 +27,7 @@ public:
         _heapify_down(heap_i);
     }
 
-    const V& view(const K& key)  {
+    const V& view(const K& key) {
         if (map_.find(key) == map_.end()) throw runtime_error("Key does not exist");
         return heap_[map_[key]].second;
     }
@@ -43,8 +42,8 @@ public:
         return item;
     }
 
-    pair<K, V> max() const {
-        if (heap_.empty()) return {};
+    const pair<K, V>& max() const {
+        if (heap_.empty()) throw runtime_error("The heap is empty.");
         return heap_[0];
     }
 
@@ -101,10 +100,10 @@ private:
         size_t largest = i;
         size_t left = _left_child(i);
         size_t right = _right_child(i);
-        if (left < heap_.size() && keyFunc_(heap_[left].second) > keyFunc_(heap_[largest].second)) {
+        if (left < heap_.size() && keyFunc_(heap_[left]) > keyFunc_(heap_[largest])) {
             largest = left;
         }
-        if (right < heap_.size() && keyFunc_(heap_[right].second) > keyFunc_(heap_[largest].second)) {
+        if (right < heap_.size() && keyFunc_(heap_[right]) > keyFunc_(heap_[largest])) {
             largest = right;
         }
         if (largest != i) {
@@ -114,7 +113,7 @@ private:
     }
 
     void _heapify_up(size_t i) {
-        while (i > 0 && keyFunc_(heap_[i].second) > keyFunc_(heap_[_parent(i)].second)) {
+        while (i > 0 && keyFunc_(heap_[i]) > keyFunc_(heap_[_parent(i)])) {
             _swap(i, _parent(i));
             i = _parent(i);
         }
@@ -164,5 +163,4 @@ public:
     ConstIterator end() const {
         return ConstIterator(*this, heap_.size());
     }
-
 };
