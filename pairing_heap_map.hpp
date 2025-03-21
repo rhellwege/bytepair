@@ -1,4 +1,5 @@
 #include <functional>
+#include <stdexcept>
 #include <unordered_map>
 
 using namespace std;
@@ -40,10 +41,10 @@ private:
         if(a == nullptr) return b;
         if(b == nullptr) return a;
 
-        // To maintain the min heap condition compare
+        // To maintain the max heap condition compare
         // the nodes and node with minimum value become
         // parent of the other node
-        if(a->key < b->key) {
+        if(keyFunc_(a->key) > keyFunc_(b->key)) {
             a->addChild(b);
             return a;
         }
@@ -54,23 +55,52 @@ private:
 
         return nullptr; // Unreachable
     }
+    // This method is used when we want to delete root node
+    PairingHeapNode<K,V> *twopassmerge_(PairingHeapNode<K,V> *node) {
+        if(node == nullptr || node->nextSibling == nullptr)
+            return node;
+        else {
+            PairingHeapNode<K,V> *a, *b, *newNode;
+            a = node;
+            b = node->nextSibling;
+            newNode = node->nextSibling->nextSibling;
+
+            a->nextSibling = nullptr;
+            b->nextSibling = nullptr;
+
+            return merge_(merge_(a, b), twopassmerge_(newNode));
+        }
+
+        return nullptr; // Unreachable
+    }
+
+    // Function to delete the root node in heap
+    PairingHeapNode<K,V> *remove_(PairingHeapNode<K,V> *node) {
+        return twopassmerge_(node->leftChild);
+    }
 public:
     PairingHeapMap(HeapKeyFunc keyFunc) : keyFunc_(keyFunc) {};
     ~PairingHeapMap() = default;
 
     void push(const K& key, const V& value) {
+        merge_(root, new PairingHeapNode<K, V>(make_pair(key, value), nullptr, nullptr));
     }
 
     void update(const K& key, const function<void(V&)>& updateFunc) {
     }
 
-    const V& view(const K& key) const {
+    const V& view(const K& key) {
     }
 
     pair<K, V> pop() {
+        pair<K,V> top = max();
+        remove_(root);
+        return top;
     }
 
     const pair<K, V>& max() const {
+        if (root == nullptr) throw runtime_error("Cannot view the top of empty");
+        return root->key;
     }
 
     bool contains(K key) const {

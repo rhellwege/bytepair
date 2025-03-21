@@ -15,9 +15,11 @@ using namespace std;
 //#define VERBOSE
 #define PRINT_EVERY 1000
 
+typedef uint32_t Token;
+
 struct Pair {
-    size_t l;
-    size_t r;
+    Token l;
+    Token r;
 
     bool operator==(const Pair& b) const {
         return (l == b.l && r == b.r);
@@ -26,13 +28,13 @@ struct Pair {
 
 struct PairHash {
     size_t operator()(const Pair& p) const {
-        return hash<size_t>()(p.l) ^ (hash<size_t>()(p.r) << 1);
+        return hash<Token>()(p.l) ^ (hash<Token>()(p.r) << 1);
     }
 };
 
 struct PairOccurrences {
     Pair pair;
-    unordered_set<size_t> occurrences; // compare based on the size of the set
+    unordered_set<Token> occurrences; // compare based on the size of the set
 
     friend ostream& operator<<(ostream& os, const PairOccurrences& p) {
         os << "(" << p.pair.l << ", " << p.pair.r << ") -> [";
@@ -50,7 +52,7 @@ size_t heapKeyFunc(const pair<Pair, PairOccurrences>& p) {
 
 class BPE_Encoding {
 private:
-    inline void inc_pair(Pair pair, size_t i) {
+    inline void inc_pair(Pair pair, Token i) {
         if (!freqs.contains(pair)) {
             freqs.push(pair, PairOccurrences{pair, {i}});
         } else {
@@ -59,7 +61,7 @@ private:
             });
         }
     }
-    inline void dec_pair(Pair pair, size_t i) {
+    inline void dec_pair(Pair pair, Token i) {
         if (!freqs.contains(pair)) {
             throw out_of_range("Pair not found, cannot decrement");
         } else {
@@ -76,8 +78,7 @@ public:
     //FibHeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
-    LinkedArray<size_t> tokens_arr;
-    vector<size_t> buffer;
+    LinkedArray<Token> tokens_arr;
     vector<Pair> grammar;
     size_t iterations;
     chrono::time_point<std::chrono::system_clock> start;
@@ -86,7 +87,7 @@ public:
     BPE_Encoding(const string& input) : freqs([](const pair<Pair, PairOccurrences>& p) { return p.second.occurrences.size(); }) {
         since_last_print = chrono::system_clock::now();
         start = chrono::system_clock::now();
-        vector<size_t> tokens;
+        vector<Token> tokens;
         iterations = 0;
         highest_freq = 0;
         for (const unsigned char& c : input) {
@@ -96,7 +97,7 @@ public:
         // construct the linked array of tokens
         tokens_arr.fill(tokens);
 
-        for (size_t i = 0; i < 256; i++) {
+        for (Token i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
         }
 
@@ -111,7 +112,7 @@ public:
     BPE_Encoding(const vector<char>& input) : freqs([](const pair<Pair, PairOccurrences>& p) { return p.second.occurrences.size(); }) {
         since_last_print = chrono::system_clock::now();
         start = chrono::system_clock::now();
-        vector<size_t> tokens;
+        vector<Token> tokens;
         iterations = 0;
         highest_freq = 0;
         for (const unsigned char& c : input) {
@@ -121,7 +122,7 @@ public:
         // construct the linked array of tokens
         tokens_arr.fill(tokens);
 
-        for (size_t i = 0; i < 256; i++) {
+        for (Token i = 0; i < 256; i++) {
             grammar.push_back(Pair{i, 0});
         }
 
@@ -132,7 +133,6 @@ public:
             }
         }
     }
-
 
     friend ostream& serialize(ostream& os, BPE_Encoding& bpe) {
         os << "bpe";
@@ -189,7 +189,7 @@ public:
         while (freqs.contains(most_freq_pair) && freqs.view(most_freq_pair).occurrences.size() > 0) {
             size_t occurence = *freqs.view(most_freq_pair).occurrences.begin();
             if (tokens_arr.get_raw(occurence) == nullptr) continue;
-            Node<size_t>* raw = tokens_arr.get_raw(occurence);
+            Node<Token>* raw = tokens_arr.get_raw(occurence);
             assert(raw != nullptr);
 
             // if previous exists, decrease old left (ab) if a exists
@@ -213,13 +213,13 @@ public:
 
             // increase new left (aZ) but only if there was already a token in tokens_out
             if (raw->prev != nullptr) {
-                Pair lpair = {raw->prev->data, grammar.size() - 1};
+                Pair lpair = {raw->prev->data, (Token)(grammar.size() - 1)};
                 inc_pair(lpair, raw->prev->index);
             }
 
             // increase new right (Zd) but only if there is a future token in input
             if (raw->next != nullptr) {
-                Pair rpair = {grammar.size() - 1, raw->next->data};
+                Pair rpair = {(Token)(grammar.size() - 1), raw->next->data};
                 inc_pair(rpair, occurence);
             }
         }
@@ -285,8 +285,8 @@ public:
 
         file >> grammar_size;
         grammar.clear();
-        for (size_t i = 0; i < grammar.size(); ++i) {
-            size_t l, r;
+        for (Token i = 0; i < grammar.size(); ++i) {
+            Token l, r;
             file >> l >> r;
             grammar.push_back({l, r});
         }
