@@ -28,7 +28,8 @@ struct Pair {
 
 struct PairHash {
     size_t operator()(const Pair& p) const {
-        return hash<Token>()(p.l) ^ (hash<Token>()(p.r) << 1);
+        uint64_t combined = (static_cast<uint64_t>(p.l) << 32) | p.r;
+        return combined;
     }
 };
 
@@ -277,8 +278,8 @@ public:
 
         //tokens_arr.clear();
         assert(tokens_arr.size() == 0);
-        for (size_t i = 0; i < tokens_arr_size; ++i) {
-            size_t token;
+        for (Token i = 0; i < tokens_arr_size; ++i) {
+            Token token;
             file >> token;
             //tokens_arr.push(token);
         }
@@ -329,8 +330,8 @@ int main() {
             cout << e;
     }
     cout << e;
-    // cout << "Serializing to shakie.bpe..." << endl;
-    // e.serialize("shakie.bpe");
-    // cout << "Serialization complete." << endl;
+    cout << "Serializing to shakie.bpe..." << endl;
+    e.serialize("shakie.bpe");
+    cout << "Serialization complete." << endl;
     return 0;
 }
