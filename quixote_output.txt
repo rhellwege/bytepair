@@ -1,0 +1,26 @@
+Loading quixote...
+done.
+-------------------------------------------------------------------------------------------------------
+Token Length: 596329 Unique tokens: 256 Highest freq: 0 (0, 0) Freq table size: 1991
+elapsed time: 0.313276s
+iteration: 0
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 579322 Unique tokens: 257 Highest freq: 17007 (101, 32) Freq table size: 2083
+elapsed time: 0.0841782s
+iteration: 1
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 115197 Unique tokens: 10256 Highest freq: 3 (806, 369) Freq table size: 101490
+elapsed time: 2.24351s
+iteration: 10000
+
+-------------------------------------------------------------------------------------------------------
+Token Length: 95104 Unique tokens: 19594 Highest freq: 1 (324, 4642) Freq table size: 95103
+elapsed time: 0.13518s
+iteration: 19339
+
+Total elapsed time: 2.77628s
+Serializing to quixote.bpe...
+Serialization complete.
+LinkedArray destructor called 596329

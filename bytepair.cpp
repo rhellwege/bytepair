@@ -5,7 +5,6 @@
 #include <fstream>
 #include <chrono>
 #include <unordered_set>
-//#include <set>
 #include <assert.h>
 #include "heap_map.hpp"
 #include "linked_array.hpp"
@@ -13,7 +12,7 @@
 using namespace std;
 
 //#define VERBOSE
-#define PRINT_EVERY 1000
+#define PRINT_EVERY 10
 
 typedef uint32_t Token;
 
@@ -28,8 +27,8 @@ struct Pair {
 
 struct PairHash {
     size_t operator()(const Pair& p) const {
-        uint64_t combined = (static_cast<uint64_t>(p.l) << 32) | p.r;
-        return combined;
+        const size_t* combined = reinterpret_cast<const size_t*>(&p); // could use a union instead
+        return *combined;
     }
 };
 
@@ -317,10 +316,10 @@ vector<char> readFileToBytes(const string& filename) {
 }
 
 int main() {
-    cout << "Loading shakespear..." << endl;
-    vector<char> shakie = readFileToBytes("./shakespear.txt");
+    cout << "Loading quixote..." << endl;
+    vector<char> quixote = readFileToBytes("./quixote.txt");
     cout << "done." << endl;
-    BPE_Encoding e(shakie);
+    BPE_Encoding e(quixote);
     cout << e;
     e.reduce();
     cout << e;
@@ -330,8 +329,8 @@ int main() {
             cout << e;
     }
     cout << e;
-    cout << "Serializing to shakie.bpe..." << endl;
-    e.serialize("shakie.bpe");
+    cout << "Serializing to quixote.bpe..." << endl;
+    e.serialize("quixote.bpe");
     cout << "Serialization complete." << endl;
     return 0;
 }
