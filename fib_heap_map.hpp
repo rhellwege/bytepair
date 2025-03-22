@@ -1,3 +1,4 @@
+#include <iostream>
 #include <functional>
 #include <stdexcept>
 #include <sys/types.h>
@@ -46,7 +47,7 @@ struct FibHeapNode {
 template <typename K, typename V, typename Hasher, typename HeapKeyFunc>
 class FibHeapMap {
 private:
-    unordered_map<K, V> map_;
+    unordered_map<K, FibHeapNode<pair<K,V>>*, Hasher> map_;
     HeapKeyFunc keyFunc_;
     uint32_t max_degree_;
     FibHeapNode<pair<K,V>>* max_;
@@ -98,7 +99,13 @@ private:
     }
 
 public:
-    FibHeapMap(HeapKeyFunc keyFunc) : keyFunc_(keyFunc), max_degree_(0), max_(nullptr), aux_arr_({nullptr}) {};
+    FibHeapMap(HeapKeyFunc keyFunc) {
+        keyFunc_ = keyFunc;
+        aux_arr_.push_back(nullptr);
+        max_degree_ = 0;
+        max_ = nullptr;
+    }
+
     ~FibHeapMap() = default;
 
     void push(const K& key, const V& value) {
@@ -127,9 +134,12 @@ public:
         // Get the new key value after the update
         uint32_t new_key_value = keyFunc_(node->data);
 
+        cout << "New key value: " << new_key_value << "old" << old_key_value << endl;
+
         // Check if the key has increased or decreased
         if (new_key_value < old_key_value) { // ?? here can we use the max of the children?
             // Remove from parent
+            if (!node->parent) return;
             if (!node->parent->marked) {
                 FibHeapNode<pair<K,V>>* parent = node->parent;
                 if (parent->child == node) {
@@ -204,7 +214,7 @@ public:
         }
     }
 
-    const V& view(const K& key) const {
+    const V& view(const K& key) {
         if (map_.find(key) == map_.end()) throw std::runtime_error("Key not found");
         return map_.at(key)->data.second;
     }
@@ -233,6 +243,7 @@ public:
         if (it == map_.end()) throw std::runtime_error("Key not found");
 
         FibHeapNode<pair<K,V>>* node = it->second;
+        auto ret = node->data;
 
         // If the node is the max node, we need to update max_
         // Remove the node from its siblings
@@ -273,6 +284,6 @@ public:
 
         _consolidate();
         // Return the erased data
-        return make_pair(it); // Return the key and the value that was set to zero
+        return ret; // Return the key and the value that was set to zero
     }
 };

@@ -6,13 +6,14 @@
 #include <chrono>
 #include <unordered_set>
 #include <assert.h>
-#include "heap_map.hpp"
+//#include "heap_map.hpp"
+#include "fib_heap_map.hpp"
 #include "linked_array.hpp"
 
 using namespace std;
 
-//#define VERBOSE
-#define PRINT_EVERY 10
+// #define VERBOSE
+#define PRINT_EVERY 1
 
 typedef uint32_t Token;
 
@@ -57,6 +58,7 @@ private:
             freqs.push(pair, PairOccurrences{pair, {i}});
         } else {
             freqs.update(pair, [&](PairOccurrences& po) {
+                cout << "Incrementing pair: " << pair.l << " " << pair.r << " " << i << endl;
                 po.occurrences.insert(i);
             });
         }
@@ -65,16 +67,23 @@ private:
         if (!freqs.contains(pair)) {
             throw out_of_range("Pair not found, cannot decrement");
         } else {
+            cout << "Decrement pair: " << pair.l << " " << pair.r << " " << i << endl;
+
             freqs.update(pair, [&](PairOccurrences& po) {
+                cout << "Im updating..." << endl;
                 po.occurrences.erase(i);
+                cout << "occurrences erased" << endl;
             });
+            cout << "OUTSIDE OF FUNCTION\n";
+            cout << &freqs.view(pair);
             if (freqs.view(pair).occurrences.empty()) {
+                cout << "Erasing pair: " << pair.l << " " << pair.r << endl;
                 freqs.erase(pair);
             }
         }
     }
 public:
-    HeapMap<Pair, PairOccurrences, PairHash, function<size_t(const pair<Pair, PairOccurrences>&)>> freqs;
+    FibHeapMap<Pair, PairOccurrences, PairHash, function<size_t(const pair<Pair, PairOccurrences>&)>> freqs;
     //FibHeapMap<Pair, PairOccurrences, PairHash, function<size_t(const PairOccurrences&)>> freqs;
     Pair most_freq_pair;
     size_t highest_freq;
@@ -317,9 +326,9 @@ vector<char> readFileToBytes(const string& filename) {
 
 int main() {
     cout << "Loading quixote..." << endl;
-    vector<char> quixote = readFileToBytes("./quixote.txt");
+    vector<char> test = readFileToBytes("./test.txt");
     cout << "done." << endl;
-    BPE_Encoding e(quixote);
+    BPE_Encoding e(test);
     cout << e;
     e.reduce();
     cout << e;
@@ -329,8 +338,8 @@ int main() {
             cout << e;
     }
     cout << e;
-    cout << "Serializing to quixote.bpe..." << endl;
-    e.serialize("quixote.bpe");
+    cout << "Serializing to test.bpe..." << endl;
+    e.serialize("test.bpe");
     cout << "Serialization complete." << endl;
     return 0;
 }
